@@ -7,6 +7,7 @@ class Game(scrapy.Item):
     score1 = scrapy.Field()
     playing = scrapy.Field()
     end = scrapy.Field()
+    inning = scrapy.Field()
 
 
 
@@ -15,7 +16,11 @@ class Game(scrapy.Item):
         end_str="(終了)" if self["end"] else ""
 
         if self["playing"]:
-            return "{0} {1} - {2} {3} {4}".format(self["team0"], self["score0"], self["score1"], self["team1"], end_str)
+            if self["inning"] == "" :
+                return "{0} {1} - {2} {3} {4}".format(self["team0"], self["score0"], self["score1"], self["team1"], end_str)
+            else:
+                return "{0} {1} - {2} {3} ({4})".format(self["team0"], self["score0"], self["score1"], self["team1"], self["inning"])
+                
         else:
             return "{0} - {1} (開始前)".format(self["team0"], self["team1"])
 

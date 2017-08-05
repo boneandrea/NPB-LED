@@ -38,9 +38,11 @@ class NpbSpider(scrapy.Spider):
 
             mygame["team0"]=game.css("tr td.yjMS span a::text")[0].extract()
             mygame["team1"]=game.css("tr td.yjMS span a::text")[1].extract()
-            #print(mygame["inning"])
-            # mygame["status"]=game.css("tr td.yjMS span a::text")[1].extract()
-            # "end yjMSt bt bb"
+
+            if len(game.css("tr td.active a::text")) > 0:
+                mygame["inning"]=(game.css("tr td.active a::text").extract())[0]
+            else:
+                mygame["inning"]=""
 
             g=0
 
