@@ -42,6 +42,7 @@ request(YAHOO_URL, (e, response, body) => {
         ledPost(gamesInfo.join('　'))
     } catch (e) {
         console.error(e)
+        postErrorToSlack(`[NPB] send failed;${e.message}`);
     }
 })
 
@@ -61,5 +62,25 @@ const ledPost = (s) => {
         },
         form: data,
     }
-    request.post(options, function (error, response, body) {})
+    request.post(options, function (error, response, body) {
+        body=JSON.parse(body)
+        if(!body.result){
+            console.log(error);
+            console.log(response);
+        }
+    })
 }
+
+const postErrorToSlack=(s)=>{
+    const request = require('request')
+    const options = {
+        uri: process.env.slack_hook,
+        headers: {
+            'Content-type': 'application/json',
+        },
+        json:{
+            text: s
+        }
+    }
+    request.post(options, function (error, response, body) {})
+};
