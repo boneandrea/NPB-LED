@@ -27,12 +27,14 @@ request(YAHOO_URL, (e, response, body) => {
             const team_r = q('div.bb-score__team > p.bb-score__awayLogo').textContent.trim()
 
             if (q('.bb-score__score.bb-score__score--left')) {
+                // 試合中
                 const score_l = q('.bb-score__score.bb-score__score--left').textContent.trim()
                 const score_r = q('.bb-score__score.bb-score__score--right').textContent.trim()
                 const inning = q('.bb-score__link').textContent.trim()
                 gamesInfo.push(`${team_l} ${score_l}-${score_r} ${team_r} (${inning})`)
             } else if (q('.bb-score__link')) {
-                const result = q('.bb-score__link').textContent.trim()
+                // 中止とか
+                const result = q('.bb-score__link').textContent.trim().replace(/見どころ/,"開始前")
                 gamesInfo.push(`${team_l}-${team_r} (${result})`)
             }
         })
