@@ -7,6 +7,7 @@ const { JSDOM } = require('jsdom')
 require('dotenv').config()
 
 const YAHOO_URL = process.env.yahoo_url
+const GAMES_FILE="./games.json"
 
 request(YAHOO_URL, (e, response, body) => {
     if (e) {
@@ -18,6 +19,7 @@ request(YAHOO_URL, (e, response, body) => {
         const q = (s) => dom.window.document.querySelector(s)
         const qa = (s) => dom.window.document.querySelectorAll(s)
 
+        const date=q(".bb-head02__title").textContent
         const gamesInfo = []
         const games = qa('.bb-score__item')
 
@@ -38,13 +40,39 @@ request(YAHOO_URL, (e, response, body) => {
                 gamesInfo.push(`${team_l}-${team_r} (${result})`)
             }
         })
-        console.log(gamesInfo)
-        ledPost(gamesInfo.join('　'))
+        const data={
+            date,
+            games: gamesInfo,
+        }
+
+        console.log(data)
+
+        const json=JSON.stringify(data)
+        const lastData=getLastData()
+
+        if(json !== lastData){
+            console.log('post to LED')
+            ledPost(data.games.join('　'))
+        }
+
+        const fs=require("fs")
+        fs.writeFileSync(GAMES_FILE, JSON.stringify(data))
     } catch (e) {
         console.error(e)
         postErrorToSlack(`[NPB] send failed;${e.message}`);
     }
 })
+
+const getLastData=()=>{
+    const fs=require("fs")
+    try{
+        return fs.readFileSync(GAMES_FILE, 'utf-8')
+    } catch (e) {
+        console.error(e)
+        return ""
+    }
+}
+
 
 const ledPost = (s) => {
     const spacer = '　　　　　　　　'
