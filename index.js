@@ -23,6 +23,7 @@ request(YAHOO_URL, (e, response, body) => {
         const gamesInfo = []
         const games = qa('.bb-score__item')
 
+        let notOnPlayGames=0;
         Array.from(games, (g) => {
             const q = (s) => g.querySelector(s)
             const team_l = q('div.bb-score__team > p.bb-score__homeLogo').textContent.trim()
@@ -38,25 +39,29 @@ request(YAHOO_URL, (e, response, body) => {
                 // 中止とか
                 const result = q('.bb-score__link').textContent.trim().replace(/見どころ/,"開始前")
                 gamesInfo.push(`${team_l}-${team_r} (${result})`)
+                notOnPlayGames++;
             }
         })
+
         const data={
             date,
             games: gamesInfo,
         }
 
         console.log(data)
+        const fs=require("fs")
+        fs.writeFileSync(GAMES_FILE, JSON.stringify(data))
 
         const json=JSON.stringify(data)
         const lastData=getLastData()
 
         if(json !== lastData){
-            console.log('post to LED')
-            ledPost(data.games.join('　'))
+            if(games.length !== notOnPlayGames){
+                console.log('post to LED')
+                ledPost(data.games.join('　'))
+            }
         }
 
-        const fs=require("fs")
-        fs.writeFileSync(GAMES_FILE, JSON.stringify(data))
     } catch (e) {
         console.error(e)
         postErrorToSlack(`[NPB] send failed;${e.message}`);
