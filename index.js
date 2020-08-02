@@ -48,12 +48,11 @@ request(YAHOO_URL, (e, response, body) => {
             games: gamesInfo,
         }
 
-        console.log(data)
+        const lastData=getLastData()
         const fs=require("fs")
         fs.writeFileSync(GAMES_FILE, JSON.stringify(data))
 
         const json=JSON.stringify(data)
-        const lastData=getLastData()
 
         if(json !== lastData){
             if(games.length !== notOnPlayGames){
