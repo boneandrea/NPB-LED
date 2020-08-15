@@ -34,7 +34,7 @@ request(YAHOO_URL, (e, response, body) => {
                 const score_l = q('.bb-score__score.bb-score__score--left').textContent.trim()
                 const score_r = q('.bb-score__score.bb-score__score--right').textContent.trim()
                 const inning = q('.bb-score__link').textContent.trim()
-                gamesInfo.push(`${team_l} ${score_l}-${score_r} ${team_r} (${inning})`)
+                gamesInfo.push(`${team_l} 対 ${team_r} : ${score_l}-${score_r} (${inning})`)
             } else if (q('.bb-score__link')) {
                 // 中止とか
                 const result = q('.bb-score__link').textContent.trim().replace(/見どころ/,"開始前")
