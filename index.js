@@ -4,6 +4,7 @@
 
 const request = require('request')
 const { JSDOM } = require('jsdom')
+const parseGame=require("./parseGame");
 require('dotenv').config()
 
 const YAHOO_URL = process.env.yahoo_url
@@ -23,24 +24,13 @@ request(YAHOO_URL, (e, response, body) => {
         const gamesInfo = []
         const games = qa('.bb-score__item')
 
-        let notOnPlayGames=0;
-        Array.from(games, (g) => {
-            const q = (s) => g.querySelector(s)
-            const team_l = q('div.bb-score__team > p.bb-score__homeLogo').textContent.trim()
-            const team_r = q('div.bb-score__team > p.bb-score__awayLogo').textContent.trim()
+        const params={
+            notOnPlayGames:0
+        };
 
-            if (q('.bb-score__score.bb-score__score--left')) {
-                // 試合中
-                const score_l = q('.bb-score__score.bb-score__score--left').textContent.trim()
-                const score_r = q('.bb-score__score.bb-score__score--right').textContent.trim()
-                const inning = q('.bb-score__link').textContent.trim()
-                gamesInfo.push(`${team_l} 対 ${team_r} : ${score_l}-${score_r} (${inning})`)
-            } else if (q('.bb-score__link')) {
-                // 中止とか
-                const result = q('.bb-score__link').textContent.trim().replace(/見どころ/,"開始前")
-                gamesInfo.push(`${team_l}-${team_r} (${result})`)
-                notOnPlayGames++;
-            }
+        Array.from(games, (g) => {
+            const game=parseGame.parse(g,params);
+            gamesInfo.push(game);
         })
 
         const data={
@@ -55,8 +45,7 @@ request(YAHOO_URL, (e, response, body) => {
         const json=JSON.stringify(data)
 
         if(json !== lastData){
-            if(games.length !== notOnPlayGames){
-                console.log('post to LED')
+            if(games.length !== params.notOnPlayGames){
                 ledPost(data.games.join('　'))
             }
         }
