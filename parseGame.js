@@ -24,16 +24,19 @@ module.exports = {
 
                 const gameLiveUrl = q('.bb-score__content').getAttribute('href')
                 const self = this
-                const p_info = await self.getLiveInfo(gameLiveUrl)
+                const p_info = await self.getLiveInfo(gameLiveUrl).catch((e)=>{
+                    throw new Error(e.message)
+                })
 
                 return `${team_l} 対 ${team_r} : [${p_info.home}]${score_l}-${score_r}[${p_info.away}] (${inning})`
             }
         } else if (q('.bb-score__link')) {
             // 中止とか
-            console.log('2;' + q('.bb-score__link').textContent.trim())
             const result = q('.bb-score__link').textContent.trim().replace(/見どころ/, '開始前')
             params.notOnPlayGames++
             return `${team_l}-${team_r} (${result})`
+        } else {
+            throw new Error("想定外")
         }
     },
 
