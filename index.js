@@ -10,7 +10,7 @@ require('dotenv').config()
 const YAHOO_URL = process.env.yahoo_url
 const GAMES_FILE = './games.json'
 
-request(YAHOO_URL, (e, response, body) => {
+request(YAHOO_URL,  async (e, response, body) =>{
     if (e) {
         console.error(e)
     }
@@ -28,11 +28,15 @@ request(YAHOO_URL, (e, response, body) => {
             notOnPlayGames: 0,
         }
 
-        Array.from(games, async (g) => {
-            const game = await parseGame.parse(g, params)
-            gamesInfo.push(game)
+        Array.from(games, (g) => {
+            const r=parseGame.parse(g, params)
+            console.log(r)
+            gamesInfo.push(r)
         })
+        await Promise.all(gamesInfo);
 
+        console.log("A")
+        console.log(gamesInfo)
         const data = {
             date,
             games: gamesInfo,
@@ -44,12 +48,18 @@ request(YAHOO_URL, (e, response, body) => {
 
         const json = JSON.stringify(data)
 
+        const led_message=data.games.join('　')
+        console.log("B")
+        console.log(led_message)
         if (json !== lastData) {
             if (games.length !== params.notOnPlayGames) {
-                ledPost(data.games.join('　'))
+                ledPost(led_message)
             }
         }
     } catch (e) {
+        console.log(e)
+        console.error(e)
+        console.error(e)
         console.error(e)
         postErrorToSlack(`[NPB] send failed;${e.message}`)
     }
@@ -66,7 +76,8 @@ const getLastData = () => {
 }
 
 const ledPost = (s) => {
-    const spacer = '　　　　　　　　'
+//    const spacer = '　　　　　　　　'
+    const spacer = '　'.repeat(5)
     const data = {
         str: spacer + '【むくむくニュース】' + s,
     }
