@@ -28,15 +28,13 @@ request(YAHOO_URL,  async (e, response, body) =>{
             notOnPlayGames: 0,
         }
 
-        Array.from(games, (g) => {
-            const r=parseGame.parse(g, params)
-            console.log(r)
-            gamesInfo.push(r)
+        games.forEach(async (g) => {
+            gamesInfo.push(await parseGame.parse(g, params))
         })
         await Promise.all(gamesInfo);
 
-        console.log("A")
         console.log(gamesInfo)
+
         const data = {
             date,
             games: gamesInfo,
@@ -49,7 +47,6 @@ request(YAHOO_URL,  async (e, response, body) =>{
         const json = JSON.stringify(data)
 
         const led_message=data.games.join('　')
-        console.log("B")
         console.log(led_message)
         if (json !== lastData) {
             if (games.length !== params.notOnPlayGames) {
