@@ -26,7 +26,6 @@ module.exports = {
 
                         const gameLiveUrl = q('.bb-score__content').getAttribute('href')
                         const self = this
-                        res("PuGA");
                         // const p_info = await self.getLiveInfo(gameLiveUrl).catch((e)=>{
                         //     throw new Error(e.message)
                         // })
@@ -40,8 +39,7 @@ module.exports = {
                     params.notOnPlayGames++
                     res( `${team_l}-${team_r} (${result})`)
                 } else {
-                    rej("ii")
-                    throw new Error("想定外")
+                    rej("parse error")
                 }
             }catch(e){
                 console.log(e)
