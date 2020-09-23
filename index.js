@@ -9,7 +9,10 @@ require('dotenv').config()
 
 const YAHOO_URL = process.env.yahoo_url
 const GAMES_FILE = './games.json'
-
+if(process.argv[2] === "help"){
+    console.log("Usage: option [nosend]");
+    process.exit()
+}
 request(YAHOO_URL,  async (e, response, body) =>{
     if (e) {
         console.error(e)
@@ -50,13 +53,13 @@ request(YAHOO_URL,  async (e, response, body) =>{
         console.log(led_message)
         if (json !== lastData) {
             if (games.length !== params.notOnPlayGames) {
-                ledPost(led_message)
+                if(process.argv[2] !== "nosend"){
+                    ledPost(led_message)
+                }
             }
         }
     } catch (e) {
         console.log(e)
-        console.error(e)
-        console.error(e)
         console.error(e)
         postErrorToSlack(`[NPB] send failed;${e.message}`)
     }
